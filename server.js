@@ -13,7 +13,15 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
-app.use(cors());
+const FRONTEND_URL = 'https://ecommerce-frontend-omega-three.vercel.app';
+
+const corsOptions = {
+    origin: FRONTEND_URL, 
+    credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
+
+app.use(cors(corsOptions)); 
 
 connectDB();
 connectClodinary();
@@ -30,4 +38,5 @@ app.get('/', (req,res)=>{
 app.listen(port,()=>{
     console.log('server is running :'+port);
 });
+
 
