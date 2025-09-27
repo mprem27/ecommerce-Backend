@@ -13,7 +13,7 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
-const FRONTEND_URL = 'https://ecommerce-frontend-omega-three.vercel.app';
+const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
 
 const corsOptions = {
     origin: FRONTEND_URL, 
