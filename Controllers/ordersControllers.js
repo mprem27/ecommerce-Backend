@@ -19,7 +19,6 @@ const razorpayInstance = new razorpay({
 })
 
 
-
 const placeOrder = async (req, res) => {
     try {
         const { userId, items, amount, address } = req.body;
@@ -47,7 +46,11 @@ const placeOrder = async (req, res) => {
 const placeOrderStripe = async (req, res) => {
     try {
         const { address, items, amount, userId } = req.body;
-        const { origin } = req.headers;
+        // IMPORTANT: For Vercel/Render, use the host header for generating the callback URL reliably
+        const origin = req.headers.host === 'ecommerce-frontend-omega-three.vercel.app' 
+                     ? `https://${req.headers.host}` 
+                     : `https://ecommerce-frontend-omega-three.vercel.app`;
+
         const OrderData = {
             userId,
             items,
@@ -70,8 +73,8 @@ const placeOrderStripe = async (req, res) => {
                 product_data: {
                     name: item.name,
                 },
-                unit_amount: amount * 100
-                // unit_amount: item.price * 100 
+                // Assuming amount is the total order value, if you calculate per item, change unit_amount accordingly
+                unit_amount: (item.price || amount) * 100 // Use item price or total amount
             },
             quantity: item.quantity
         }
@@ -89,7 +92,9 @@ const placeOrderStripe = async (req, res) => {
         });
 
         const session = await stripe.checkout.sessions.create({
-            success_url: `${origin}/verify?success=true&orderId=${newOrder._id}`,
+            // Ensure this URL points back to your Vercel frontend's Verify route
+            // The Stripe success URL now correctly includes the session_id
+            success_url: `${origin}/verify?success=true&session_id={CHECKOUT_SESSION_ID}&orderId=${newOrder._id}`,
             cancel_url: `${origin}/verify?success=false&orderId=${newOrder._id}`,
             line_items: line_items,
             mode: 'payment',
@@ -106,18 +111,87 @@ const placeOrderStripe = async (req, res) => {
 }
 
 const verifyPaymentStripe = async (req, res) => {
-    const { orderId, success, userId } = req.body;
+    // NOTE: The frontend Verify.jsx component MUST NOW pass the session_id in the body.
+    // The query params from the frontend Verify.jsx are: ?success=true&session_id=...&orderId=...
+    // The frontend should be updated to send: { success, orderId, session_id }
+    const { orderId, success, session_id } = req.body; 
+    
+    // We will use the session_id for verification, if it is not present, we use the old logic for compatibility.
+    // The Vercel Verify.jsx component needs to be updated to pass session_id.
+    
     try {
-        if (success === 'true') {
-            await orderModel.findByIdAndUpdate(orderId, { payment: true });
-            await UserModel.findByIdAndUpdate(userId, { cartData: {} });
-            res.json({ success: true, message: "Order Placed Successfully!" });
-        } else {
-            res.json({ success: false, message: "Order Not Placed !" });
+        if (success !== true && success !== 'true') {
+            // Cancelled or explicit failure from the frontend URL parameters
+            const order = await orderModel.findByIdAndDelete(orderId);
+            if (order) {
+                // Do not delete cart if payment failed, just the temporary order
+                return res.json({ success: false, message: "Order payment was cancelled." });
+            }
+            return res.status(404).json({ success: false, message: "Order not found or already deleted." });
         }
+        
+        // --- 1. PROPER STRIPE VERIFICATION (REQUIRED) ---
+        if (session_id) {
+            const session = await stripe.checkout.sessions.retrieve(session_id);
+
+            if (session.payment_status === 'paid' && session.metadata.orderId === orderId) {
+                 await orderModel.findByIdAndUpdate(orderId, { payment: true });
+                 const order = await orderModel.findById(orderId);
+                 await UserModel.findByIdAndUpdate(order.userId, { cartData: {} });
+                 
+                 // SUCCESS RESPONSE
+                 return res.status(200).json({ 
+                    success: true, 
+                    message: "Order placed successfully! (Verified by Stripe Session)" 
+                });
+            } else {
+                 await orderModel.findByIdAndDelete(orderId);
+                 return res.status(400).json({ 
+                    success: false, 
+                    message: "Stripe verification failed: Payment status not paid." 
+                });
+            }
+
+        } 
+        
+        // --- 2. FALLBACK/SIMPLIFIED LOGIC (Only runs if session_id is missing, highly discouraged in production) ---
+        else {
+             // Retrieve the order to get the userId and confirm the status
+            const order = await orderModel.findById(orderId);
+
+            if (!order) {
+                return res.status(404).json({ success: false, message: "Order not found in database." });
+            }
+
+            // Check if the payment status is already true to prevent double processing
+            if (order.payment) {
+                 return res.status(200).json({ success: true, message: "Order already verified and placed." });
+            }
+
+            // Simplified success logic based on the success URL parameter:
+            await orderModel.findByIdAndUpdate(orderId, { payment: true });
+            
+            // Clear the user's cart
+            await UserModel.findByIdAndUpdate(order.userId, { cartData: {} }); 
+            
+            // --- FINAL SUCCESS RESPONSE ---
+            return res.status(200).json({ 
+                success: true, 
+                message: "Order placed successfully! (Verified via redirect status)" 
+            });
+        }
+
+
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: "Error Created in PlaceOrder Verifying Order with Stripe on _OrderController.js" + error.message });
+        // --- CATCH-ALL CRASH RESPONSE ---
+        // This clean JSON response prevents the Vercel crash!
+        console.error("Internal Error in verifyStripe route:", error);
+        
+        // Return a clean, simple, standardized JSON error response
+        return res.status(500).json({ 
+            success: false, 
+            message: "Internal Server Error during verification: " + (error.message || 'Unknown Stripe Error')
+        });
     }
 }
 
@@ -222,7 +296,7 @@ const updateOrderStatus = async (req, res) => {
         res.json({ success: true, message: "Order Status is Updated" });
     } catch (error) {
         console.log(error)
-        res.json({ success: false, message: "Error Created in updating  Orders Status on _OrderController.js" + error.message });
+        res.json({ success: false, message: "Error Created in updating  Orders Status on _OrderController.js" + error.message });
     }
 }
 
