@@ -1,6 +1,6 @@
 import express from 'express'
 import { AddProduct,listProduct, removeProduct } from '../Controllers/ProductController.js';
-import AdminAuth from '../middlewares/Adminauth.js';
+import AdminAuth from '../middlewares/AdminAuth.js'
 import upload from '../middlewares/Multer.js';
 
 
