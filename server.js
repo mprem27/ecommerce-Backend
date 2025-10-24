@@ -13,30 +13,31 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
-const allowedOrigins = [
-  'https://ecommerce-frontend-two-beige.vercel.app',
-  'https://ecommerce-admin-coral-eight.vercel.app'
-];
-
-const corsOptions = {
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
-};
-
-// const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
+// const allowedOrigins = [
+//   'https://ecommerce-frontend-two-beige.vercel.app',
+//   'https://ecommerce-admin-coral-eight.vercel.app'
+// ];
 
 // const corsOptions = {
-//     origin: FRONTEND_URL, 
-//     credentials: true, 
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       callback(null, true);
+//     } else {
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true,
+//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 // };
+
+const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
+const ADMIN_URL = 'https://ecommerce-admin-git-main-m-prem-kumar-reddys-projects.vercel.app';
+
+const corsOptions = {
+    origin: FRONTEND_URL,ADMIN_URL, 
+    credentials: true, 
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+};
 
 app.use(cors(corsOptions)); 
 
@@ -52,21 +53,21 @@ app.get('/', (req,res)=>{
     res.send('API IS WORKING....');
 });
 
-// app.listen(port,()=>{
-//     console.log('server is running :'+port);
-// });
-
-app.listen(port, () => {
-    console.log(`Server running on port: ${port}`);
+app.listen(port,()=>{
+    console.log('server is running :'+port);
 });
 
-// if (process.env.NODE_ENV !== 'production') {
-//     app.listen(port, () => {
-//         console.log(`Server is running locally on port: ${port}`);
-//     });
-// }
+// app.listen(port, () => {
+//     console.log(`Server running on port: ${port}`);
+// });
 
-export default app; 
+// // if (process.env.NODE_ENV !== 'production') {
+// //     app.listen(port, () => {
+// //         console.log(`Server is running locally on port: ${port}`);
+// //     });
+// // }
+
+// export default app; 
 
 
 
