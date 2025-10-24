@@ -13,13 +13,30 @@ const app = express();
 const port = process.env.PORT || 4000;
 
 app.use(express.json());
-const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
+const allowedOrigins = [
+  'https://ecommerce-frontend-two-beige.vercel.app',
+  'https://ecommerce-admin-coral-eight.vercel.app'
+];
 
 const corsOptions = {
-    origin: FRONTEND_URL, 
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 };
+
+// const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
+
+// const corsOptions = {
+//     origin: FRONTEND_URL, 
+//     credentials: true, 
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+// };
 
 app.use(cors(corsOptions)); 
 
