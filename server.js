@@ -16,8 +16,8 @@ app.use(express.json());
 
 // --- START CORS FIX ---
 // Read origins from environment variables for flexibility
-const FRONTEND_URL = process.env.FRONTEND_URL; // Main Frontend URL
-const ADMIN_FRONTEND_URL = process.env.ADMIN_FRONTEND_URL; // Admin Frontend URL
+const FRONTEND_URL = ecommerce-frontend-two-beige.vercel.app; // Main Frontend URL
+const ADMIN_FRONTEND_URL = ecommerce-admin-coral-eight.vercel.app; // Admin Frontend URL
 const ALLOWED_ORIGINS = [];
 
 if (FRONTEND_URL) {
