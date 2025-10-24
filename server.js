@@ -39,11 +39,15 @@ app.get('/', (req,res)=>{
 //     console.log('server is running :'+port);
 // });
 
-if (process.env.NODE_ENV !== 'production') {
-    app.listen(port, () => {
-        console.log(`Server is running locally on port: ${port}`);
-    });
-}
+app.listen(port, () => {
+    console.log(`Server running on port: ${port}`);
+});
+
+// if (process.env.NODE_ENV !== 'production') {
+//     app.listen(port, () => {
+//         console.log(`Server is running locally on port: ${port}`);
+//     });
+// }
 
 export default app; 
 
