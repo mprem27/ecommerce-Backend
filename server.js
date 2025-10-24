@@ -31,7 +31,7 @@ app.use(express.json());
 // };
 
 const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
-const ADMIN_URL = 'https://ecommerce-admin-git-main-m-prem-kumar-reddys-projects.vercel.app';
+const ADMIN_URL = 'https://ecommerce-admin-coral-eight.vercel.app';
 
 const corsOptions = {
     origin: FRONTEND_URL,ADMIN_URL, 
