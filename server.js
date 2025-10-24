@@ -31,10 +31,10 @@ app.use(express.json());
 // };
 
 const FRONTEND_URL = 'https://ecommerce-frontend-two-beige.vercel.app';
-const ADMIN_URL = 'https://ecommerce-admin-coral-eight.vercel.app';
+// const ADMIN_URL = 'https://ecommerce-admin-coral-eight.vercel.app';
 
 const corsOptions = {
-    origin: FRONTEND_URL,ADMIN_URL, 
+    origin: FRONTEND_URL, 
     credentials: true, 
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 };
