@@ -10,41 +10,32 @@ import OrderRouter from './Routes/ordersRouter.js';
 
 dotenv.config();
 const app = express();
-
-
-const PORT = process.env.PORT || 8080;
-
+const PORT = process.env.PORT || 4000;
 
 app.use(express.json());
 app.use(
   cors({
-    origin:  [
-  "https://ecommerce-frontend-two-beige.vercel.app",
-  "https://ecommerce-admin-ten-psi.vercel.app"
-]
+    origin: [
+      "https://ecommerce-frontend-two-beige.vercel.app",
+      "https://ecommerce-admin-coral-eight.vercel.app"
+    ],
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   })
 );
 
-
+// connections
 connectDB();
 connectCloudinary();
 
-
+// routes
 app.use('/api/user', UserRouter);
 app.use('/api/Product', ProductRouter);
 app.use('/api/cart', CartRouter);
 app.use('/api/order', OrderRouter);
 
+app.get('/', (req, res) => res.send('API IS WORKING...'));
 
-app.get('/', (req, res) => {
-  res.send('API IS WORKING...');
-});
-
-
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
 
 export default app;
