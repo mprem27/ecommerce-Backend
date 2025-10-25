@@ -10,8 +10,9 @@ import OrderRouter from './Routes/ordersRouter.js';
 
 dotenv.config();
 const app = express();
-const PORT = process.env.PORT || 4000;
+const port = process.env.PORT || 4000;
 
+// Middleware
 app.use(express.json());
 app.use(
   cors({
@@ -20,22 +21,26 @@ app.use(
       "https://ecommerce-admin-coral-eight.vercel.app"
     ],
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
   })
 );
 
-// connections
+// Connect to database and cloud
 connectDB();
 connectCloudinary();
 
-// routes
+// Routes
 app.use('/api/user', UserRouter);
-app.use('/api/Product', ProductRouter);
+app.use('/api/product', ProductRouter); 
 app.use('/api/cart', CartRouter);
 app.use('/api/order', OrderRouter);
 
-app.get('/', (req, res) => res.send('API IS WORKING...'));
+// Root endpoint
+app.get('/', (req, res) => {
+  res.send('API IS WORKING....');
+});
 
-app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
-
-export default app;
+// Start server
+app.listen(port, () => {
+  console.log(` Server is running on port: ${port}`);
+});
