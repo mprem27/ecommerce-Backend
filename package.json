@@ -5,7 +5,7 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "start Eccomerce-backend"
+    "start": "node server.js"
   },
   "author": "Eccomerce",
   "license": "ISC",
