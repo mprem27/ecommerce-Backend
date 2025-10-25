@@ -11,35 +11,38 @@ import OrderRouter from './Routes/ordersRouter.js';
 dotenv.config();
 const app = express();
 
-// ✅ Use Railway's dynamic PORT
-const PORT = process.env.PORT || 4000;
 
-// ✅ Setup Middleware
+const PORT = process.env.PORT || 8080;
+
+
 app.use(express.json());
 app.use(
   cors({
-    origin: "https://ecommerce-frontend-two-beige.vercel.app",
+    origin:  [
+  "https://ecommerce-frontend-two-beige.vercel.app",
+  "https://ecommerce-admin-ten-psi.vercel.app"
+]
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"]
   })
 );
 
-// ✅ Connect Services
+
 connectDB();
 connectCloudinary();
 
-// ✅ Routes
+
 app.use('/api/user', UserRouter);
 app.use('/api/Product', ProductRouter);
 app.use('/api/cart', CartRouter);
 app.use('/api/order', OrderRouter);
 
-// ✅ Health check route
+
 app.get('/', (req, res) => {
   res.send('API IS WORKING...');
 });
 
-// ✅ Listen (important for Railway)
+
 app.listen(PORT, () => {
   console.log(`✅ Server running on port ${PORT}`);
 });
