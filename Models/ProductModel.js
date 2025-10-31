@@ -9,7 +9,7 @@ const ProductSchema = new mongoose.Schema({
     category: { type: String, required: true },
     subcategory: { type: String, required: true },
     bestseller: { type: Boolean },
-    todaysdeals: { type: Boolean },
+    Todaysdeals: { type: Boolean },
     date: { type: Number, required: true }
 })
 
